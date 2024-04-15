@@ -188,7 +188,7 @@ class GridOptions extends AbstractOptions
      * This option controls what to do when an ajax operation is in progress.
      * 'disable', 'enable' or 'block'
      */
-    protected ?string $loadType = 'disable';
+    protected ?string $loadType = 'enable';
 
     /**
      * If this flag is set to true a multi selection of rows is enabled. A new column at left side is added. Can be used
