@@ -3,7 +3,6 @@
 namespace Lemo\JqGrid\View\Helper;
 
 use Laminas\I18n\Translator\TranslatorInterface;
-use Laminas\Json;
 use Laminas\View\Helper\AbstractHelper;
 use Lemo\JqGrid\ColumnAttributes;
 use Lemo\JqGrid\ColumnInterface;
@@ -30,6 +29,7 @@ use function parse_url;
 use function strtolower;
 use function strtoupper;
 
+use const JSON_THROW_ON_ERROR;
 use const PHP_EOL;
 
 class JqGrid extends AbstractHelper
@@ -260,7 +260,7 @@ class JqGrid extends AbstractHelper
                     'rules' => $rules,
                 ]
             ];
-            $script[] = '        postData: ' . Json\Encoder::encode($postData) . ',' . PHP_EOL;
+            $script[] = '        postData: ' . json_encode($postData, JSON_THROW_ON_ERROR) . ',' . PHP_EOL;
         }
 
         $script[] = '        colNames: [\'' . implode('\', \'', $colNames) . '\'],';
