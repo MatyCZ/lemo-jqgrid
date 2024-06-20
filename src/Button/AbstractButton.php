@@ -17,7 +17,7 @@ use function strtolower;
 
 abstract class AbstractButton implements ButtonInterface
 {
-    /** @var array<string, scalar|null>  */
+    /** @var array<string, bool|int|float|string|null>  */
     protected array $attributes = [];
 
     /**
@@ -111,7 +111,7 @@ abstract class AbstractButton implements ButtonInterface
     protected array $validTagAttributes = [];
 
     /**
-     * @param scalar|null $value
+     * @param bool|int|float|string|null $value
      */
     public function setAttribute(string $key, $value): self
     {
@@ -121,7 +121,7 @@ abstract class AbstractButton implements ButtonInterface
     }
 
     /**
-     * @return scalar|null
+     * @return bool|int|float|string|null
      */
     public function getAttribute(string $key)
     {
@@ -145,7 +145,7 @@ abstract class AbstractButton implements ButtonInterface
     }
 
     /**
-     * @param iterable<string, scalar|null> $arrayOrTraversable
+     * @param iterable<string, bool|int|float|string|null> $arrayOrTraversable
      */
     public function setAttributes(iterable $arrayOrTraversable): self
     {
@@ -157,7 +157,7 @@ abstract class AbstractButton implements ButtonInterface
     }
 
     /**
-     * @return array<string, scalar|null>
+     * @return array<string, bool|int|float|string|null>
      */
     public function getAttributes(): array
     {
