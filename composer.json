@@ -1,7 +1,6 @@
 {
     "name": "matycz/lemo-jqgrid",
     "description": "",
-    "type": "library",
     "keywords": [
         "laminas",
         "jqgrid"
@@ -17,9 +16,12 @@
         "laminas/laminas-paginator": "^2.0",
         "laminas/laminas-paginator-adapter-laminasdb": "^1.0",
         "laminas/laminas-stdlib": "^3.0",
-        "laminas/laminas-session": "^2.0",
         "laminas/laminas-view": "^2.0",
         "php": "^8.3"
+    },
+    "suggest": {
+        "laminas/laminas-session": "Required to support session storage from the Laminas\\Session library.",
+        "mezzio/mezzio-session": "Required to support session storage from the Mezzio\\Session library."
     },
     "autoload": {
         "psr-4": {

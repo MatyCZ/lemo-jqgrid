@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Lemo\JqGrid\Storage\Php;
+namespace Lemo\JqGrid\Storage\Laminas;
 
 use ArrayIterator;
 use Laminas\Session\Container as SessionContainer;
