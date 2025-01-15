@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Lemo\JqGrid\Adapter\Laminas;
 
 use DateTime;
+use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Adapter\AdapterInterface;
+use Laminas\Db\ResultSet\ResultSet;
 use Laminas\Db\Sql\Expression;
 use Laminas\Db\Sql\Predicate\Predicate;
 use Laminas\Db\Sql\Select;
-use Laminas\Paginator\Adapter\LaminasDb\DbSelect;
-use Laminas\Paginator\Paginator;
+use Laminas\Db\Sql\Sql;
 use Lemo\JqGrid\Adapter\AbstractAdapter;
 use Lemo\JqGrid\Column\Concat as ColumnConcat;
 use Lemo\JqGrid\ColumnAttributes;
@@ -32,6 +33,7 @@ class SelectAdapter extends AbstractAdapter
 {
     protected ?AdapterInterface $adapter = null;
     protected ?Select $select = null;
+    protected ?Sql $sql = null;
 
     #[\Override]
     public function prepare(Grid $grid): self
@@ -42,9 +44,15 @@ class SelectAdapter extends AbstractAdapter
 
         $this->setGrid($grid);
 
+        if (!$this->getAdapter() instanceof AdapterInterface) {
+            throw new Exception\UnexpectedValueException(
+                sprintf("No '%s' instance given.", Adapter::class)
+            );
+        }
+
         if (!$this->getSelect() instanceof Select) {
             throw new Exception\UnexpectedValueException(
-                sprintf("No '%s' instance given", Select::class)
+                sprintf("No '%s' instance given.", Select::class)
             );
         }
 
@@ -63,18 +71,15 @@ class SelectAdapter extends AbstractAdapter
     #[\Override]
     public function fetchData(): self
     {
-        $paginatorAdapter = new DbSelect($this->getSelect(), $this->getAdapter());
-        $paginator = new Paginator($paginatorAdapter);
-        $paginator->setCurrentPageNumber($this->getGrid()->getNumberOfCurrentPage());
-        $paginator->setItemCountPerPage($this->getGrid()->getNumberOfVisibleRows());
-
         $columns = $this->getGrid()->getColumns();
-        $rows = $paginator->getIterator()->getArrayCopy();
-        $rowsCount = $paginator->getCurrentItemCount();
+
+        $rows = $this->executeFetchRows();
+        $rowsCount = count($rows);
+        $rowsTotal = $this->executeFetchRowsTotal();
 
         // Update count of items
         $this->countItems = $rowsCount;
-        $this->countItemsTotal = $paginator->getTotalItemCount();
+        $this->countItemsTotal = $rowsTotal;
 
         $data = [];
         for ($indexRow = 0; $indexRow < $rowsCount; $indexRow++) {
@@ -554,6 +559,47 @@ class SelectAdapter extends AbstractAdapter
         }
     }
 
+    private function executeFetchRows(): array
+    {
+        $numberPage = $this->getGrid()->getNumberOfCurrentPage();
+        $numberRowsPerPage = $this->getGrid()->getNumberOfVisibleRows();
+
+        $offset = ($numberPage - 1) * $numberRowsPerPage;
+
+        $select = clone $this->select;
+        $select->offset($offset);
+        $select->limit($numberRowsPerPage);
+
+        $sql = new Sql($this->getAdapter());
+
+        $result = $sql->prepareStatementForSqlObject($select)->execute();
+
+        $resultSet = new ResultSet();
+        $resultSet->initialize($result);
+
+        return iterator_to_array($resultSet);
+    }
+
+    private function executeFetchRowsTotal(): int
+    {
+        $select = clone $this->select;
+        $select->reset(Select::LIMIT);
+        $select->reset(Select::OFFSET);
+        $select->reset(Select::ORDER);
+
+        $countSelect = new Select();
+        $countSelect->columns(['count' => new Expression('COUNT(1)')]);
+        $countSelect->from(['original_select' => $select]);
+
+        $sql = new Sql($this->getAdapter());
+
+        $result = $sql->prepareStatementForSqlObject($countSelect)->execute();
+
+        $row = $result->current();
+
+        return (int) $row['count'];
+    }
+
     public function setAdapter(?AdapterInterface $adapter): self
     {
         $this->adapter = $adapter;
@@ -566,9 +612,6 @@ class SelectAdapter extends AbstractAdapter
         return $this->adapter;
     }
 
-    /**
-     * Set Select
-     */
     public function setSelect(?Select $select): self
     {
         $this->select = $select;
@@ -576,9 +619,6 @@ class SelectAdapter extends AbstractAdapter
         return $this;
     }
 
-    /**
-     * Return Select
-     */
     public function getSelect(): ?Select
     {
         return $this->select;

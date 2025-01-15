@@ -63,9 +63,10 @@ class CombineAdapter extends AbstractAdapter
     public function fetchData(): self
     {
         $columns = $this->getGrid()->getColumns();
-        $rows = $this->executeSelect();
+
+        $rows = $this->executeFetchRows();
         $rowsCount = count($rows);
-        $rowsTotal = $this->executeSelectCount();
+        $rowsTotal = $this->executeFetchRowsTotal();
 
         // Update count of items
         $this->countItems = $rowsCount;
@@ -114,6 +115,7 @@ class CombineAdapter extends AbstractAdapter
                     }
 
                     $data[$indexRow][$colName] = $value;
+
                     $column->setValue($value);
                 }
             }
@@ -134,7 +136,7 @@ class CombineAdapter extends AbstractAdapter
         return $this;
     }
 
-    public function executeSelect(): array
+    public function executeFetchRows(): array
     {
         $zendSql = new Sql($this->getAdapter());
 
@@ -153,7 +155,7 @@ class CombineAdapter extends AbstractAdapter
     /**
      * @return int
      */
-    public function executeSelectCount(): int
+    public function executeFetchRowsTotal(): int
     {
         $zendSql = new Sql($this->getAdapter());
 
