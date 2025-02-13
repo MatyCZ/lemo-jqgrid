@@ -8,6 +8,7 @@ use Lemo\JqGrid\Exception;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Router\RouteResult;
 
+use function array_merge;
 use function sprintf;
 use function urldecode;
 
@@ -57,9 +58,7 @@ class LinkRoute extends AbstractButton
         }
 
         if (null === $urlHelper->getRouteResult()) {
-            throw new Exception\RuntimeException(
-                "No route result found",
-            );
+            throw new Exception\RuntimeException("No route result found");
         }
 
         $routeName = $this->getRouteName();
@@ -71,12 +70,7 @@ class LinkRoute extends AbstractButton
             if (array_key_exists($keyData, $rowData)) {
                 $routeParams[$keyRoute] = $rowData[$keyData];
             } else {
-                throw new Exception\RuntimeException(
-                    sprintf(
-                        "Key '%s' was not found in row data.",
-                        $keyData
-                    )
-                );
+                throw new Exception\RuntimeException("Key '$keyData' was not found in row data.");
             }
         }
 
@@ -95,9 +89,7 @@ class LinkRoute extends AbstractButton
             $routeName = $routeResult->getMatchedRouteName();
 
             if (null === $routeName) {
-                throw new Exception\RuntimeException(
-                    'RouteResult does not contain a matched route name.'
-                );
+                throw new Exception\RuntimeException('RouteResult does not contain a matched route name.');
             }
         }
 

@@ -35,9 +35,7 @@ class Link extends AbstractButton
         $hrefParams = $this->getHrefParams();
 
         if (null === $href) {
-            throw new Exception\RuntimeException(
-                "Href is not set."
-            );
+            throw new Exception\RuntimeException("Href is not set.");
         }
 
         if (null !== $hrefParams) {
@@ -47,12 +45,7 @@ class Link extends AbstractButton
                 if (array_key_exists($keyData, $rowData)) {
                     $hrefParams[$keyRoute] = $rowData[$keyData];
                 } else {
-                    throw new Exception\RuntimeException(
-                        sprintf(
-                            "Key '%s' was not found in row data.",
-                            $keyData
-                        )
-                    );
+                    throw new Exception\RuntimeException("Key '$keyData' was not found in row data.");
                 }
             }
 

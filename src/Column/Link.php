@@ -47,12 +47,7 @@ class Link extends AbstractColumn
                 if (array_key_exists($keyData, $rowData)) {
                     $hrefParams[$keyRoute] = $rowData[$keyData];
                 } else {
-                    throw new Exception\RuntimeException(
-                        sprintf(
-                            "Key '%s' was not found in row data.",
-                            $keyData
-                        )
-                    );
+                    throw new Exception\RuntimeException("Key '$keyData' was not found in row data.");
                 }
             }
 

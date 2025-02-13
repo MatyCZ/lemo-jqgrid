@@ -10,7 +10,10 @@ use Lemo\JqGrid\ColumnCondition;
 use Lemo\JqGrid\Constant\OperatorConstant;
 use Lemo\JqGrid\Exception;
 
+use function array_key_exists;
 use function implode;
+use function in_array;
+use function is_array;
 use function sprintf;
 use function str_starts_with;
 use function strtolower;
@@ -226,7 +229,8 @@ abstract class AbstractButton implements ButtonInterface
         foreach ($attributes as $key => $value) {
             $attribute = strtolower($key);
 
-            if (!isset($this->validGlobalAttributes[$attribute])
+            if (
+                !isset($this->validGlobalAttributes[$attribute])
                 && !isset($this->validTagAttributes[$attribute])
                 && !str_starts_with($attribute, 'data-')
             ) {
@@ -235,7 +239,7 @@ abstract class AbstractButton implements ButtonInterface
                 continue;
             }
 
-            // Normalize attribute key, if needed
+            // Normalize the attribute key, if needed
             if ($attribute != $key) {
                 unset($attributes[$key]);
                 $attributes[$attribute] = $value;

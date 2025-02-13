@@ -25,9 +25,9 @@ use function count;
 use function explode;
 use function in_array;
 use function is_array;
-use function preg_match_all;
+use function iterator_to_array;
 use function reset;
-use function str_replace;
+use function sprintf;
 
 class SelectAdapter extends AbstractAdapter
 {
@@ -102,33 +102,9 @@ class SelectAdapter extends AbstractAdapter
 
                     $column->setValue($value);
 
-                    $value = $column->renderValue($this, $item);
-
-                    // Projdeme data a nahradime data ve formatu %xxx%
-                    if (null !== $value && preg_match_all('/%(_?[a-zA-Z0-9\._-]+)%/', (string) $value, $matches)) {
-                        foreach ($matches[0] as $key => $match) {
-                            if ('%_index%' === $matches[0][$key]) {
-                                $value = str_replace(
-                                    $matches[0][$key],
-                                    (string) $indexRow,
-                                    (string) $value
-                                );
-                            } else {
-                                $value = str_replace(
-                                    $matches[0][$key],
-                                    $this->findValue($matches[1][$key], $item),
-                                    (string) $value
-                                );
-                            }
-                        }
-                    }
-
-                    $data[$indexRow][$colName] = $value;
-
-                    $column->setValue($value);
+                    $data[$indexRow][$colName] = $column->renderValue($this, $item);
                 }
             }
-
         }
 
         $this->getGrid()->getResultSet()->setData($data);
@@ -226,7 +202,7 @@ class SelectAdapter extends AbstractAdapter
         if (!empty($filter['rules'])) {
             $havingCol = [];
             $whereCol = [];
-            foreach($columns as $indexCol => $col) {
+            foreach($columns as $col) {
                 if (true === $col->getAttributes()->getIsSearchable() && true !== $col->getAttributes()->getIsHidden()) {
 
                     // Jsou definovane filtry pro sloupec

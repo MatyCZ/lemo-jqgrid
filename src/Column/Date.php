@@ -9,8 +9,6 @@ use Lemo\JqGrid\ColumnAttributes;
 
 class Date extends AbstractColumn
 {
-    protected ?array $textToReplace = null;
-
     public function __construct(
         string $name,
         ?string $identifier = null
@@ -29,6 +27,5 @@ class Date extends AbstractColumn
     public function renderValue(AdapterInterface $adapter, array $rowData): ?string
     {
         return (string) $this->getValue();
-
     }
 }

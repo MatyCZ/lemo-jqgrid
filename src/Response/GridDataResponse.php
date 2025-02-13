@@ -55,6 +55,7 @@ class GridDataResponse extends JsonResponse
         }
 
         $dataUser = $grid->getResultSet()->getDataUser();
+
         if (!empty($dataUser)) {
             $json['userdata'] = $dataUser;
         }
