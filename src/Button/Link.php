@@ -6,15 +6,16 @@ namespace Lemo\JqGrid\Button;
 
 use Lemo\JqGrid\Exception;
 
-use function array_keys;
-use function array_values;
 use function sprintf;
-use function str_replace;
 
 class Link extends AbstractButton
 {
     protected ?string $href = null;
-    protected ?array $hrefParams = null;
+
+    /**
+     * @var callable|null
+     */
+    protected $hrefCallback = null;
 
     protected array $validTagAttributes = [
         'download' => true,
@@ -31,29 +32,14 @@ class Link extends AbstractButton
     #[\Override]
     public function render(array $rowData): string
     {
-        $href = $this->getHref();
-        $hrefParams = $this->getHrefParams();
+        if (null !== $this->hrefCallback && is_callable($this->hrefCallback)) {
+            $href = call_user_func($this->hrefCallback, $rowData);
+        } else {
+            $href = $this->getHref();
 
-        if (null === $href) {
-            throw new Exception\RuntimeException("Href is not set.");
-        }
-
-        if (null !== $hrefParams) {
-
-            // Upravime parametry
-            foreach ($hrefParams as $keyRoute => $keyData) {
-                if (array_key_exists($keyData, $rowData)) {
-                    $hrefParams[$keyRoute] = $rowData[$keyData];
-                } else {
-                    throw new Exception\RuntimeException("Key '$keyData' was not found in row data.");
-                }
+            if (null === $href) {
+                throw new Exception\RuntimeException("Href is not set.");
             }
-
-            $href = str_replace(
-                array_keys($hrefParams),
-                array_values($hrefParams),
-                $href
-            );
         }
 
         $attributes = $this->getAttributes();
@@ -78,15 +64,15 @@ class Link extends AbstractButton
         return $this->href;
     }
 
-    public function setHrefParams(?array $hrefParams): self
+    public function setHrefCallback(callable $callback): self
     {
-        $this->hrefParams = $hrefParams;
+        $this->hrefCallback = $callback;
 
         return $this;
     }
 
-    public function getHrefParams(): ?array
+    public function getHrefCallback(): ?callable
     {
-        return $this->hrefParams;
+        return $this->hrefCallback;
     }
 }
