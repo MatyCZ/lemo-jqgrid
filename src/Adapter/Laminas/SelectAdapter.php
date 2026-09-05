@@ -563,6 +563,13 @@ class SelectAdapter extends AbstractAdapter
         $select->reset(Select::OFFSET);
         $select->reset(Select::ORDER);
 
+        if (
+            null === $select->getRawState(Select::GROUP)
+            && 0 === $select->getRawState(Select::HAVING)->count()
+        ) {
+            $select->columns(['x' => new Expression('1')]);
+        }
+
         $countSelect = new Select();
         $countSelect->columns(['count' => new Expression('COUNT(1)')]);
         $countSelect->from(['original_select' => $select]);
